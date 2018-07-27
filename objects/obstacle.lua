@@ -55,12 +55,12 @@ function obstacle:new(params)
 	self:get(self.curBlock).shape = {}
 	self:get(self.curBlock).fixture = {}
 
-	local bodys = math.random(levels[level].minSides, levels[level].maxSides)
+	local bodys = numGen:random(math.floor(level.minSides), math.ceil(level.maxSides))
 	local sideWidth = 0
 	local holeSize = 0
 	if bodys == 1 then
-		holeSize = math.random(levels[level].minHoleSize, levels[level].maxHoleSize)
-		sideWidth = math.random(self.minWidth, self.maxWidth - levels[level].maxHoleSize)
+		holeSize = math.random(level.minHoleSize, level.maxHoleSize)
+		sideWidth = math.random(self.minWidth, self.maxWidth - level.maxHoleSize)
 		if math.random() > 0.5 then
 			self:genSide(self.curBlock, {
 				x = sideWidth / 2,
@@ -79,8 +79,8 @@ function obstacle:new(params)
 	else
 		local widthUsed = 0
 		for i = 1, bodys - 1, 1 do
-			holeSize = math.random(levels[level].minHoleSize, levels[level].maxHoleSize)
-			sideWidth = math.random(self.minWidth, w - widthUsed - (levels[level].maxHoleSize + self.minWidth) * (bodys - i))
+			holeSize = math.random(level.minHoleSize, level.maxHoleSize)
+			sideWidth = math.random(self.minWidth, w - widthUsed - (level.maxHoleSize + self.minWidth) * (bodys - i))
 			self:genSide(self.curBlock, {
 				x = widthUsed + (sideWidth)/2,
 				y = -self:get(self.curBlock).height/2,
@@ -104,7 +104,8 @@ function obstacle:genSide(index, params)
 	local pointer = table.getn(self:get(index).body) + 1
 	self:get(index).body[pointer]    = love.physics.newBody(world, params.x, params.y, "dynamic")
 	self:get(index).body[pointer]:setGravityScale(0)
-	self:get(index).body[pointer]:setLinearVelocity(0, levels[level].velocity)
+	self:get(index).body[pointer]:setLinearVelocity(0, level.velocity)
+	self:get(index).body[pointer]:setAngularVelocity(numGen:random(-level.angularSpeed * 100, level.angularSpeed * 100) / 100)
 
 	self:get(index).shape[pointer]   = love.physics.newRectangleShape(params.width, params.height)
 	self:get(index).fixture[pointer] = love.physics.newFixture(self:get(index).body[pointer], self:get(index).shape[pointer], 1e6)
@@ -119,71 +120,132 @@ function obstacle:draw()
 	for i, obs in ipairs(self.s) do
 		for j, b in ipairs(obs.body) do
 			local x1, y1, x2, y2, x3, y3, x4, y4 = b:getWorldPoints(obs.shape[j]:getPoints())
-			trianglesPerObs = math.floor(math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) / lw)
+			trianglesPerObs = math.floor(math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) / lw) + 1
 			lwAdj = math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) / trianglesPerObs
-			love.graphics.setColor(obs.color)
-			love.graphics.polygon("fill", x1, y1, x2, y2, x3, y3, x4, y4)
-			love.graphics.setColor(BackgroundColor)
-			--love.graphics.setColor(0, 0, 0)
+
 			local centerX1 = b:getX() - math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) / 2
 			local centerX2 = b:getX() + math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) / 2
 
 			local centerY1 = b:getY() + math.sqrt((x3 - x2) ^ 2 + (y3 - y2) ^ 2) / 2
 			local centerY2 = b:getY() - math.sqrt((x3 - x2) ^ 2 + (y3 - y2) ^ 2) / 2
+
+			love.graphics.setColor(obs.color)
 			if self:get(i).spikesAtTop then
-				for k = 1, trianglesPerObs, 1 do
-					love.graphics.polygon(
-						"fill", 
-						centerX1 + ((x3 - lwAdj * k)             - centerX1) * math.cos(b:getAngle()) - ( y1          - centerY1) * math.sin(b:getAngle()),
-						centerY1 + ((x3 - lwAdj * k)             - centerX1) * math.sin(b:getAngle()) + ( y1          - centerY1) * math.cos(b:getAngle()),
-						centerX1 + ((x3 - lwAdj * k + lwAdj / 2) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
-						centerY1 + ((x3 - lwAdj * k + lwAdj / 2) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle()),
-						centerX1 + ((x3 - lwAdj * k + lwAdj)     - centerX1) * math.cos(b:getAngle()) - ( y1          - centerY1) * math.sin(b:getAngle()),
-						centerY1 + ((x3 - lwAdj * k + lwAdj)     - centerX1) * math.sin(b:getAngle()) + ( y1          - centerY1) * math.cos(b:getAngle())
-					)
-				end
+				love.graphics.polygon(
+					"fill",
+					x1 - lwAdj * math.sin(b:getAngle()),
+					y1 + lwAdj * math.cos(b:getAngle()),
+					x2 - lwAdj * math.sin(b:getAngle()),
+					y2 + lwAdj * math.cos(b:getAngle()),
+					x3,
+					y3,
+					x4,
+					y4
+				)
 			else
-				for k = 1, trianglesPerObs, 1 do
+				love.graphics.polygon(
+					"fill",
+					x1,
+					y1,
+					x2,
+					y2,
+					x3 + lwAdj * math.sin(b:getAngle()),
+					y3 - lwAdj * math.cos(b:getAngle()),
+					x4 + lwAdj * math.sin(b:getAngle()),
+					y4 - lwAdj * math.cos(b:getAngle())
+				)
+			end
+			--love.graphics.setColor(BackgroundColor)
+			--love.graphics.setColor(0, 0, 0)
+			if self:get(i).spikesAtTop then
+				love.graphics.polygon(--left triangle
+					"fill",
+					centerX1 + ( x3              - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ( x3              - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle()),
+					centerX1 + ( x3              - centerX1) * math.cos(b:getAngle()) - ( y1          - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ( x3              - centerX1) * math.sin(b:getAngle()) + ( y1          - centerY1) * math.cos(b:getAngle()),
+					centerX1 + ((x3 - lwAdj / 2) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ((x3 - lwAdj / 2) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle())
+				)
+				for k = 1, trianglesPerObs-1, 1 do
 					love.graphics.polygon(
-						"fill", 
-						centerX2 + ((x1 + lwAdj * (k - 1))             - centerX2) * math.cos(b:getAngle()) - ( y3          - centerY2) * math.sin(b:getAngle()),
-						centerY2 + ((x1 + lwAdj * (k - 1))             - centerX2) * math.sin(b:getAngle()) + ( y3          - centerY2) * math.cos(b:getAngle()),
-						centerX2 + ((x1 + lwAdj * (k - 1) + lwAdj / 2) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
-						centerY2 + ((x1 + lwAdj * (k - 1) + lwAdj / 2) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle()),
-						centerX2 + ((x1 + lwAdj * (k - 1) + lwAdj)     - centerX2) * math.cos(b:getAngle()) - ( y3          - centerY2) * math.sin(b:getAngle()),
-						centerY2 + ((x1 + lwAdj * (k - 1) + lwAdj)     - centerX2) * math.sin(b:getAngle()) + ( y3          - centerY2) * math.cos(b:getAngle())
+						"fill",
+						centerX1 + ((x3 - lwAdj * (k * 2 - 1) / 2) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+						centerY1 + ((x3 - lwAdj * (k * 2 - 1) / 2) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle()),
+						centerX1 + ((x3 - lwAdj *  k             ) - centerX1) * math.cos(b:getAngle()) - ( y1          - centerY1) * math.sin(b:getAngle()),
+						centerY1 + ((x3 - lwAdj *  k             ) - centerX1) * math.sin(b:getAngle()) + ( y1          - centerY1) * math.cos(b:getAngle()),
+						centerX1 + ((x3 - lwAdj * (k * 2 + 1) / 2) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+						centerY1 + ((x3 - lwAdj * (k * 2 + 1) / 2) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle())
 					)
 				end
+				love.graphics.polygon(--right triangle
+					"fill",
+					centerX1 + ((x3 - lwAdj * (trianglesPerObs * 2 - 1) / 2) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ((x3 - lwAdj * (trianglesPerObs * 2 - 1) / 2) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle()),
+					centerX1 + ((x3 - lwAdj *  trianglesPerObs             ) - centerX1) * math.cos(b:getAngle()) - ( y1          - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ((x3 - lwAdj *  trianglesPerObs             ) - centerX1) * math.sin(b:getAngle()) + ( y1          - centerY1) * math.cos(b:getAngle()),
+					centerX1 + ((x3 - lwAdj *  trianglesPerObs             ) - centerX1) * math.cos(b:getAngle()) - ((y1 + lwAdj) - centerY1) * math.sin(b:getAngle()),
+					centerY1 + ((x3 - lwAdj *  trianglesPerObs             ) - centerX1) * math.sin(b:getAngle()) + ((y1 + lwAdj) - centerY1) * math.cos(b:getAngle())
+				)
+			else
+				love.graphics.polygon(--left triangle
+					"fill",
+					centerX2 + ( x1              - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ( x1              - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle()),
+					centerX2 + ( x1              - centerX2) * math.cos(b:getAngle()) - ( y3          - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ( x1              - centerX2) * math.sin(b:getAngle()) + ( y3          - centerY2) * math.cos(b:getAngle()),
+					centerX2 + ((x1 + lwAdj / 2) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ((x1 + lwAdj / 2) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle())
+				)
+				for k = 1, trianglesPerObs-1, 1 do
+					love.graphics.polygon(
+						"fill",
+						centerX2 + ((x1 + lwAdj * (k * 2 - 1) / 2) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+						centerY2 + ((x1 + lwAdj * (k * 2 - 1) / 2) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle()),
+						centerX2 + ((x1 + lwAdj *  k             ) - centerX2) * math.cos(b:getAngle()) - ( y3          - centerY2) * math.sin(b:getAngle()),
+						centerY2 + ((x1 + lwAdj *  k             ) - centerX2) * math.sin(b:getAngle()) + ( y3          - centerY2) * math.cos(b:getAngle()),
+						centerX2 + ((x1 + lwAdj * (k * 2 + 1) / 2) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+						centerY2 + ((x1 + lwAdj * (k * 2 + 1) / 2) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle())
+					)
+				end
+				love.graphics.polygon(--right triangle
+					"fill",
+					centerX2 + ((x1 + lwAdj * (trianglesPerObs * 2 - 1) / 2) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ((x1 + lwAdj * (trianglesPerObs * 2 - 1) / 2) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle()),
+					centerX2 + ((x1 + lwAdj *  trianglesPerObs             ) - centerX2) * math.cos(b:getAngle()) - ( y3          - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ((x1 + lwAdj *  trianglesPerObs             ) - centerX2) * math.sin(b:getAngle()) + ( y3          - centerY2) * math.cos(b:getAngle()),
+					centerX2 + ((x1 + lwAdj *  trianglesPerObs             ) - centerX2) * math.cos(b:getAngle()) - ((y3 - lwAdj) - centerY2) * math.sin(b:getAngle()),
+					centerY2 + ((x1 + lwAdj *  trianglesPerObs             ) - centerX2) * math.sin(b:getAngle()) + ((y3 - lwAdj) - centerY2) * math.cos(b:getAngle())
+				)
 			end
 		end
 	end
 end
 
 function obstacle:update(dt)
-	if timer:get() - lastGenedBlock >= levels[level].SPB then
+	if timer:get() - lastGenedBlock >= level.SPB then
 		lastGenedBlock = timer:get()
-		if not powerUpActive then
-			blocksPassed = blocksPassed + 1
-		end
-		obstacle:new({
-			width = love.math.random(obstacle.minWidth + obstacle.holeSize, obstacle.maxWidth - obstacle.holeSize),
+		self:new({
+			width = love.math.random(self.minWidth + self.holeSize, self.maxWidth - self.holeSize),
 			color = {love.math.random(255), love.math.random(255), love.math.random(255)},
 			spikesAtTop = love.math.random() >= 0.5
 		})
 	end
 
 	for i, obs in ipairs(self.s) do
-		if not obs.passed and ball.body:getY() < obs.body[1]:getY() then 
+		if not obs.passed and ball.body:getY() < obs.body[1]:getY() then
+			if not powerUp.active then
+				level.blocksPassed = level.blocksPassed + 1
+			end
+			local toAdd = #obs.body * level.number
 			obs.passed = true
-			score = score + #obs.body * level
+			score = score + toAdd
 
 			plus1Particle:setColors(obs.color[1], obs.color[2], obs.color[3], 255,
 									obs.color[1], obs.color[2], obs.color[3], 0  )
 			plus1Particle:setPosition(ball.body:getX(), ball.body:getY())
-			plus1Particle:setEmissionRate(#obs.body * level)
+			plus1Particle:setEmitterLifetime(toAdd / plus1Particle:getEmissionRate())
 			plus1Particle:start()--emit(5)
-
-			if not powerUpActive and levels[level].toPass and blocksPassed > levels[level].toPass then level = level + 1 end
 		end
 	end
 end

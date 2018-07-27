@@ -82,6 +82,14 @@ function love.rewardUserWithReward(rewardType, rewardQuantity)
 	settings:set("coins", settings:get("coins") + 10) --+10 coins
 end
 
+function love.rewardedAdFailedToLoad()
+	love.ads.requestRewardedAd(rewardedAdId)
+end
+
+function love.interstitialFailedToLoad()
+	love.ads.requestInterstitial(interstitialId)
+end
+
 function love.interstitialClosed()
 	showingAd = false
 end

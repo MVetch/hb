@@ -4,9 +4,9 @@ ground = {
  		--[[x1--]]0, 
  		--[[y1--]]0, 
  		--[[x2--]]0, 
- 		--[[y2--]]screen:get("game").h, 
+ 		--[[y2--]]screen:get("game").h - (adHeight + 10), 
  		--[[x3--]]screen:get("game").w, 
- 		--[[y3--]]screen:get("game").h, 
+ 		--[[y3--]]screen:get("game").h - (adHeight + 10), 
  		--[[x4--]]screen:get("game").w, 
  		--[[y4--]]0
  	)
@@ -21,7 +21,7 @@ for i = -adHeight / 2, screen:get("game").w, adHeight / 2 do
 		w = 256, 
 		h = 256,
 		img = firePic,
-		duration = 0.5
+		duration = love.math.random(45, 55) / 100
 	})
 end
 
@@ -31,14 +31,14 @@ function ground:draw()
 	love.graphics.draw(
 		fireTopPic, 
 		0,
-		screen:get("game").h - heatedHeight,
+		screen:get("game").h - (adHeight + 10) - heatedHeight,
 		0,
 		screen:get("game").w / fireTopPic:getWidth(),
 		(heatedHeight + (adHeight + 10)) / fireTopPic:getHeight()
 	)
 
 	for i = -adHeight / 2, screen:get("game").w, adHeight / 2 do
-		animation:draw("fire" .. ((i + 1) / adHeight / 2), i, screen:get("game").h, (adHeight + 10), (adHeight + 10))
+		animation:draw("fire" .. ((i + 1) / adHeight / 2), i, screen:get("game").h - (adHeight + 10), (adHeight + 10), (adHeight + 10))
 	end
 	--love.graphics.polygon("line", self.body:getWorldPoints(self.shape:getPoints()))
 end

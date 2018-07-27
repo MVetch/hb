@@ -14,8 +14,7 @@ button:add("newGame", {
 		screen:get("menu").active = false
 
 		ball:reset()
-		blocksPassed = 0
-		blocksGenedWOutPowerUp = 0
+		level:reset()
 		lastGenedBlock = -SPB
 		timer:reset()
 		ballParticles:reset()
@@ -23,18 +22,17 @@ button:add("newGame", {
 		plus1Particle:stop()
 		plus1Particle:reset()
 		obstacle:clear()
+		powerUp:reset()
 		debug = ""
-		powerUp = 0
 		score = 0
-		level = 1
 		ball.dead = false
 		bonus.delay = love.math.random(10, 15)
 		bonus.timeDied = love.timer.getTime()
 
 		screen:get("game").active = true
 		screen:get("game").draw = true
-		screen:get("background").active = true
-		screen:get("background").draw   = true
+		screen:get("topMenu").active = true
+		screen:get("topMenu").draw   = true
 		button:get("pauseGame").draw   = true
 		button:get("pauseGame").active = true
 		screen:get("skins").Y = screen:get("game").Y
@@ -58,8 +56,8 @@ button:add("continueGame", {
 		screen:get("menu").draw   = false
 		screen:get("menu").active = false
 
-		screen:get("background").active = true
-		screen:get("background").draw   = true
+		screen:get("topMenu").active = true
+		screen:get("topMenu").draw   = true
 		button:get("pauseGame").active = true
 		button:get("pauseGame").draw   = true
 		screen:get("game").active = true
@@ -94,7 +92,3 @@ button:add("exit", {
 		love.event.quit()
 	end
 })
-
-if(screen.s.menu ~= nil) then function screen.s.menu.show()
-
-end end

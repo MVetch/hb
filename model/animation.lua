@@ -23,6 +23,7 @@ function animation:new(name, params)
             table.insert(animation:get(name).quads, love.graphics.newQuad(j, i, animation:get(name).w, animation:get(name).h, animation:get(name).img:getDimensions()))
         end
     end
+    return self.a[name]
 end
 function animation:draw(name, X, Y, width, height)
 	local width  = width  or animation:get(name).w

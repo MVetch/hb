@@ -32,7 +32,7 @@ function love.load()
 
 	plus1Particle = love.graphics.newParticleSystem(plus1, 50)
 	plus1Particle:setParticleLifetime(1.5)
-	plus1Particle:setEmissionRate(5)
+	plus1Particle:setEmissionRate(10)
 	plus1Particle:setEmitterLifetime(1)
 	plus1Particle:setAreaSpread("ellipse", defaultBall.r * 5, defaultBall.r * 5)
 	plus1Particle:setLinearAcceleration(0, -100)
@@ -45,6 +45,8 @@ function love.load()
 	coinParticle:setSizes(bonus.r * 2 / coin:getWidth())
 	coinParticle:setColors(255, 255, 255, 255, 
 						   255, 255, 255, 0  )
+
+	numGen = love.math.newRandomGenerator()
 	
 
 	if love.system.getOS() == "Android" then
@@ -60,6 +62,7 @@ function love.draw()
 	for name, params in screen:orderBy("z") do
 		if screen:get(name).draw then screen:show(name) end
 	end
+	topLeft(debug)
 end
 
 function love.update(dt)
@@ -73,47 +76,49 @@ function love.update(dt)
 	if screen:get("game").active then
 		world:update(dt)
 		ball:update(dt)
+		powerUp:update(dt)
 		bonus:update(dt)
 		obstacle:update(dt)
+		level:update(dt)
 	end
 end
 
-function love.run()
+-- function love.run()
 
-	local dt = 0	
+-- 	local dt = 0	
 
-	if love.load then love.load(arg) end
+-- 	if love.load then love.load(arg) end
  
-	if love.timer then love.timer.step() end
+-- 	if love.timer then love.timer.step() end
 
-	while true do
-		if love.event then
-			love.event.pump()
-			for name, a,b,c,d,e,f in love.event.poll() do
-				if name == "quit" then
-					if not love.quit or not love.quit() then
-						return a
-					end
-				end
-				love.handlers[name](a,b,c,d,e,f)
-			end
-		end
+-- 	while true do
+-- 		if love.event then
+-- 			love.event.pump()
+-- 			for name, a,b,c,d,e,f in love.event.poll() do
+-- 				if name == "quit" then
+-- 					if not love.quit or not love.quit() then
+-- 						return a
+-- 					end
+-- 				end
+-- 				love.handlers[name](a,b,c,d,e,f)
+-- 			end
+-- 		end
  
-		if love.timer then
-			love.timer.step()
-			dt = love.timer.getDelta()
-		end
+-- 		if love.timer then
+-- 			love.timer.step()
+-- 			dt = love.timer.getDelta()
+-- 		end
  
-		-- Call update and draw
-		if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+-- 		-- Call update and draw
+-- 		if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
  
-		if love.graphics and love.graphics.isActive() then
-			love.graphics.clear(love.graphics.getBackgroundColor())
-			if love.draw then love.draw() end
-			love.graphics.present()
-		end
+-- 		if love.graphics and love.graphics.isActive() then
+-- 			love.graphics.clear(love.graphics.getBackgroundColor())
+-- 			if love.draw then love.draw() end
+-- 			love.graphics.present()
+-- 		end
  
-		--if love.timer then love.timer.sleep(1/FPS) end
-	end
+-- 		--if love.timer then love.timer.sleep(1/FPS) end
+-- 	end
  
-end
+-- end

@@ -19,55 +19,20 @@ ball.fixture:setUserData("ball")
 -- 				  255, 255, 255, 0)
 
 function ball:update(dt)
-	if powerUpActive then
-		powerUp = powerUp - 100 / powerUpActiveFor * dt
-		if powerUp <= 0 then
-			powerUp = 0
-
-			powerUpActive = false
-			self.body:resetMassData()
-			force = force / 1e16 * self.body:getMass()
-			--self.body:setGravityScale(1)
-			self.immortal = false
-
-			levels[level].SPB = levels[level].SPB * 5
-			levels[level].velocity = levels[level].velocity / 10
-
-			for i, obs in ipairs(obstacle.s) do
-				for j, b in ipairs(obs.body) do
-					b:setLinearVelocity(0, levels[level].velocity)
-				end
-			end
-		end
-	else
-		if powerUp < 100 then
-			if self.body:getY() > screen:get("game").h - self.r * 5 then
-				powerUp = powerUp + 100 / powerUpActiveFor * dt
-			end
-		else
-			powerUpActive = true
-			force = force * 1e16 / self.body:getMass()
-			self.body:setMass(1e16)
-			--self.body:setGravityScale(0)
-			--self.body:setLinearVelocity((screen:get("game").w / 2 - self.body:getX()) / powerUpActiveFor, (screen:get("game").h / 2 - self.body:getY()) / powerUpActiveFor)
-			self.immortal = true
-
-			levels[level].SPB = levels[level].SPB / 5
-			levels[level].velocity = levels[level].velocity * 10
-
-			for i, obs in ipairs(obstacle.s) do
-				for j, b in ipairs(obs.body) do
-					b:setLinearVelocity(0, levels[level].velocity)
-				end
-			end
-		end
-	end
+	
 	-- ball.particles:update(dt)
 	-- ball.particles:emit(1)
 end
 
 function ball:draw()
-	skin:get(settings:get("skin")).draw(self.body:getX(), self.body:getY(), self.shape:getRadius(), {255 * powerUp / 100, -255 * powerUp / 100, -255 * powerUp / 100})
+	skin:get(
+		settings:get("skin")
+	).draw(
+		self.body:getX(), 
+		self.body:getY(), 
+		self.shape:getRadius(), 
+		{255 * powerUp.value / 100, -255 * powerUp.value / 100, -255 * powerUp.value / 100}
+	)
 end
 
 function ball:reset()

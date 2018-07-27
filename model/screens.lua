@@ -4,6 +4,8 @@ screen = {
 		Y = 0,
 		w = w,
 		h = h,
+		scaleX = 1,
+		scaleY = 1,
 		draw = false,
 		z = 1,
 		active = false,
@@ -19,22 +21,25 @@ function screen:new(name, params)
 		self.s[name][k] = params[k] or v
 	end
 	self.s[name].buttons = {}
+	return self.s[name]
 end
 
 function screen:show(name)
 	if name == nil then error("oops") end
-	love.graphics.translate(screen:get(name).X, screen:get(name).Y)
-	cursor.x = cursor.x - screen:get(name).X
-	cursor.y = cursor.y - screen:get(name).Y
-	screen:get(name):show()
-	for index, b in ipairs(screen:get(name).buttons) do
+	love.graphics.setScissor(self:get(name).X, self:get(name).Y, self:get(name).w, self:get(name).h)
+	love.graphics.translate(self:get(name).X, self:get(name).Y)
+	love.graphics.scale(self:get(name).scaleX, self:get(name).scaleY)
+	cursor.x, cursor.y = cursor.x / self:get(name).scaleX - self:get(name).X, cursor.y / self:get(name).scaleY - self:get(name).Y
+	self:get(name):show()
+	for index, b in ipairs(self:get(name).buttons) do
 		if button:get(b).draw then
 			button:draw(b)
 		end
 	end
+	love.graphics.scale(1 / self:get(name).scaleX, 1 / self:get(name).scaleY)
 	love.graphics.origin()
-	cursor.x = cursor.x + screen:get(name).X
-	cursor.y = cursor.y + screen:get(name).Y
+	cursor.x, cursor.y = cursor.x + self:get(name).X * self:get(name).scaleX, cursor.y + self:get(name).Y * self:get(name).scaleY
+	love.graphics.setScissor()
 end
 
 function screen:get(name)

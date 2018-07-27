@@ -98,7 +98,9 @@ function button:draw(name)
 	end
 
 	if button:get(name).picture then
+		love.graphics.translate(button:get(name).X, button:get(name).Y)
 		button:get(name).picture()
+		love.graphics.translate(-button:get(name).X, -button:get(name).Y)
 	end
 	
 	love.graphics.setColor(0, 0, 0)

@@ -26,7 +26,7 @@ end
 
 function bonus:generate()
 	self.exists = true
-	self.body = love.physics.newBody(world, love.math.random(self.r, screen:get("game").w - self.r), love.math.random(self.r, screen:get("game").h - self.r), "static")
+	self.body = love.physics.newBody(world, love.math.random(self.r, screen:get("game").w - self.r), love.math.random(self.r, screen:get("game").h - (adHeight + 10) - self.r), "static")
 	self.shape = love.physics.newCircleShape(self.r)
 	self.fixture = love.physics.newFixture(bonus.body, bonus.shape)
 	self.fixture:setMask(2)

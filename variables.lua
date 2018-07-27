@@ -28,7 +28,10 @@ ballParcticlePic = love.graphics.newImage("img/ballParticle.png")
 plus1            = love.graphics.newImage("img/plus1.png")
 coin             = love.graphics.newImage("img/coin.png")
 
+arrowUpPic       = love.graphics.newImage("img/arrow-up.png")
+
 spincoinAnimate  = love.graphics.newImage("img/spincoinAnimate.png")
+arrowUpAnimate   = love.graphics.newImage("img/arrow-up-animated.png")
 firePic          = love.graphics.newImage("img/fire.png")
 fireTopPic       = love.graphics.newImage("img/fireTop.png")
 
@@ -64,10 +67,6 @@ SPB = 4--seconds per block
 lastGenedBlock = -SPB
 debug = ""
 score = 0
-level = 1
-powerUp = 0
-powerUpActive = false
-powerUpActiveFor = 5
 dp = h / love.window.getPixelScale()
 adHeight = dp <= 400 and 32 or (dp > 400 and dp <= 720) and 50 or 90
 adHeight = adHeight * love.window.getPixelScale()
@@ -83,57 +82,58 @@ defaultHoleSize = defaultBall.r * 15
 
 heatedHeight = defaultBall.r * 5
 
-levels = {
-	{
-		SPB = SPB,
-		velocity = getPercent(h, 13.8), --100,
-		minSides = 1,
-		maxSides = 1,
-		movable = false,
-		minHoleSize = defaultHoleSize * 1,
-		maxHoleSize = defaultHoleSize * 1,
-		toPass = 5
-	},
-	{
-		SPB = SPB,
-		velocity = getPercent(h, 15.27), --110,
-		minSides = 1,
-		maxSides = 2,
-		movable = false,
-		minHoleSize = defaultHoleSize * 0.8,
-		maxHoleSize = defaultHoleSize * 1,
-		toPass = 10
-	},
-	{
-		SPB = SPB,
-		velocity = getPercent(h, 16.66), --120,
-		minSides = 2,
-		maxSides = 3,
-		movable = false,
-		minHoleSize = defaultHoleSize * 0.6,
-		maxHoleSize = defaultHoleSize * 0.8,
-		toPass = 15
-	},
-	{
-		SPB = SPB,
-		velocity = getPercent(h, 18.046), --130,
-		minSides = 3,
-		maxSides = 4,
-		movable = false,
-		minHoleSize = defaultHoleSize * 0.4,
-		maxHoleSize = defaultHoleSize * 0.6,
-		toPass = 20
-	},
-	{
-		SPB = SPB,
-		velocity = getPercent(h, 19.426), --140,
-		minSides = 4,
-		maxSides = 4,
-		movable = false,
-		minHoleSize = defaultHoleSize * 0.3,
-		maxHoleSize = defaultHoleSize * 0.4,
-		--toPass = 5
-	},
-}
+
+-- levels = {
+-- 	{
+-- 		SPB = SPB,
+-- 		velocity = getPercent(h, 13.8), --100,
+-- 		minSides = 1,
+-- 		maxSides = 1,
+-- 		movable = false,
+-- 		minHoleSize = defaultHoleSize * 1,
+-- 		maxHoleSize = defaultHoleSize * 1,
+-- 		toPass = 5
+-- 	},
+-- 	{
+-- 		SPB = SPB,
+-- 		velocity = getPercent(h, 15.27), --110,
+-- 		minSides = 1,
+-- 		maxSides = 2,
+-- 		movable = false,
+-- 		minHoleSize = defaultHoleSize * 0.8,
+-- 		maxHoleSize = defaultHoleSize * 1,
+-- 		toPass = 5
+-- 	},
+-- 	{
+-- 		SPB = SPB,
+-- 		velocity = getPercent(h, 16.66), --120,
+-- 		minSides = 2,
+-- 		maxSides = 3,
+-- 		movable = false,
+-- 		minHoleSize = defaultHoleSize * 0.6,
+-- 		maxHoleSize = defaultHoleSize * 0.8,
+-- 		toPass = 5
+-- 	},
+-- 	{
+-- 		SPB = SPB,
+-- 		velocity = getPercent(h, 18.046), --130,
+-- 		minSides = 3,
+-- 		maxSides = 4,
+-- 		movable = false,
+-- 		minHoleSize = defaultHoleSize * 0.4,
+-- 		maxHoleSize = defaultHoleSize * 0.6,
+-- 		toPass = 5
+-- 	},
+-- 	{
+-- 		SPB = SPB,
+-- 		velocity = getPercent(h, 19.426), --140,
+-- 		minSides = 4,
+-- 		maxSides = 4,
+-- 		movable = false,
+-- 		minHoleSize = defaultHoleSize * 0.3,
+-- 		maxHoleSize = defaultHoleSize * 0.4,
+-- 		--toPass = 5
+-- 	},
+-- }
 
 ---------------/game-----------------

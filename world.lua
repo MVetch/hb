@@ -1,16 +1,24 @@
 function beginContact(a, b, coll)
 	local x,y = coll:getNormal()
-	--debug = debug.."\n"..a:getUserData().." with "..b:getUserData().." vector is: "..string.format("%.2f", x)..", "..string.format("%.2f", y)
+	--debug = debug.."\n"..a:getUserData().." with "..b:getUserData().." vector="..string.format("%.2f", x)..", "..string.format("%.2f", y)
 	if not ball.immortal and b:getUserData() == "ball" then
 	--if a:getUserData() == "ball1" or b:getUserData() == "ball1" then
+		local diff = ((math.deg(math.acos(x) * sign(y)) - math.deg(a:getBody():getAngle()) + 180) % 360 - 180)
 		if a:getUserData() == "obstacle bottom" then
-		    if y > 0.01 then 
+			--debug = debug.."\n".."vector="..string.format("%.2f", x)..", "..string.format("%.2f", y)..", angleV="..string.format("%.2f", (math.deg(math.acos(x) * sign(y))))..", angleB="..string.format("%.2f", math.deg(a:getBody():getAngle()))..", diff="..string.format("%.2f", diff)
+		    if between(45,   diff, 135) then 
 		    	die()
 		    end
-		elseif a:getUserData() == "ground" or a:getUserData() == "obstacle top" then
-			if y < -0.01 then 
+		elseif a:getUserData() == "obstacle top" then
+			--debug = debug.."\n".."vector="..string.format("%.2f", x)..", "..string.format("%.2f", y)..", angleV="..string.format("%.2f", (math.deg(math.acos(x) * sign(y))))..", angleB="..string.format("%.2f", math.deg(a:getBody():getAngle()))..", diff="..string.format("%.2f", diff)
+			if between(-135, diff, -45) then 
 		    	die()
 		    end
+		elseif a:getUserData() == "ground" then
+			--debug = debug.."\n"..a:getUserData().." with "..b:getUserData().." vector="..string.format("%.2f", x)..", "..string.format("%.2f", y)
+			if y < -0.99 then
+				die()
+			end
 		end
 	end
 	if a:getUserData() == "ball" then

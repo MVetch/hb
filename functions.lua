@@ -16,7 +16,7 @@ end
 
 function topLeft(value)
 	love.graphics.setColor(0, 0, 0)
-	love.graphics.print(value, 0, 0)
+	love.graphics.print(value, 0, getPercent(h, 6.94))
 end
 
 function bottomLeft(value)
@@ -31,4 +31,8 @@ end
 
 function sign(x)
   return (x<0 and -1) or 1
+end
+
+function between(a, x, b, includeL, includeR)
+	return (includeL and a <= x or a < x) and (includeR and x <= b or x < b)
 end

@@ -22,8 +22,8 @@ for name, skinBody in pairs(skin.s) do
 		end,
 		picture = function()
 			skin:get(name).draw(
-				button:get(name .. "Switch").X + butWidth / 2, 
-				button:get(name .. "Switch").Y + butWidth / 2, 
+				butWidth / 2,
+				butWidth / 2,
 			butWidth / 3)
 		end
 	})
